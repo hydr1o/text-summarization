@@ -19,10 +19,9 @@ def text_summarization(text,percentage=1/4):
 
 	tf_idf_values = []
 	df = pd.DataFrame(tf_idf.toarray(),columns = vectorizer.get_feature_names())
-	with pd.option_context('display.max_rows',None,'display.max_columns',None):
-		for x in range(df.shape[0]):
-			print(sum(df.iloc[x,:]))
-			tf_idf_values.append(sum(df.iloc[x,:]))
+	for x in range(df.shape[0]):
+		print(sum(df.iloc[x,:]))
+		tf_idf_values.append(sum(df.iloc[x,:]))
 	tf_idf_mean = sum(tf_idf_values)/len(tf_idf_values)
 	important_sentences_id = []
 	for x in range(len(tf_idf_values)):
