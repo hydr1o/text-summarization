@@ -11,7 +11,7 @@ import numpy
 stopwords = stopwords.words('english')
 import pandas as pd
 
-def text_summarization(text,percentage=1/2):
+def text_summarization(text,percentage=1/4):
 	documents = sent_tokenize(text)
 	vectorizer = TfidfVectorizer(stop_words = stopwords,encoding = 'utf-8')
 	tf_idf = vectorizer.fit(documents)
