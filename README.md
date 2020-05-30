@@ -3,10 +3,12 @@ Maybe the most simple text summarization with TF-IDF on Python
 
 # How does it work?
 
-(https://www.kdnuggets.com/wp-content/uploads/text-summarization.jpg)
+![text summarization](https://www.kdnuggets.com/wp-content/uploads/text-summarization.jpg)
 
-::by Nazar Tropanets
+# by Nazar Tropanets
+This project and repository was created by Nazar Tropanets
 
+# Usage
 create python file in directory which contains textsummarization.py file from this repository and write:
 ``` python
 from textsummarization import *
