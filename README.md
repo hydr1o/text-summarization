@@ -1,6 +1,10 @@
 # text-summarization
 Maybe the most simple text summarization with TF-IDF on Python
 
+# How does it work?
+
+(https://www.kdnuggets.com/wp-content/uploads/text-summarization.jpg)
+
 ::by Nazar Tropanets
 
 create python file in directory which contains textsummarization.py file from this repository and write:
