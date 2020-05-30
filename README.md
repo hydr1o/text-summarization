@@ -1,4 +1,4 @@
-# text-summarization
+# Text Summarization
 Maybe the most simple text summarization with TF-IDF on Python
 
 # How does it work?
