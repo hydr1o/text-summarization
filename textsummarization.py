@@ -8,55 +8,75 @@ from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
 import numpy
 import math
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-stopwords = stopwords.words('english')
 import pandas as pd
+from langdetect import detect
+import nltk
+from stop_words import get_stop_words
+
+# -*- coding: utf-8 -*-
+nltk.download('stopwords')
+
 class TextSummarization:
-	def __init__(self,text,percentage=1/4,encoding='utf-8'):
-		#initializing
-		self.text = text
-		self.percentage = percentage
-		self.encoding = encoding
-	def summarize(self):
-		#tokenizing setnences
-		documents = sent_tokenize(self.text)
-		#create tf-idf vectorizer
-		vectorizer = TfidfVectorizer(stop_words = stopwords,encoding = self.encoding)
-		tf_idf = vectorizer.fit(documents)
-		tf_idf =  vectorizer.transform(documents)
-		tf_idf_values = []
-		#creating dataframe with pandas
-		self.df = pd.DataFrame(tf_idf.toarray(),columns = vectorizer.get_feature_names())
-		
-		for x in range(self.df.shape[0]):
-			#appending values
-			tf_idf_values.append(sum(self.df.iloc[x,:]))
-		
-		tf_idf_mean = sum(tf_idf_values)/len(tf_idf_values)
-		tf_idf_array = []
-		for x in range(len(tf_idf_values)):
-			tf_idf_array.append([documents[x],tf_idf_values[x]])
-		#sorting array by tf-idf
-		sorted_array = sorted(tf_idf_array, key=lambda elem: elem[1] )
-		sorted_array = sorted_array[len(sorted_array)-round(len(sorted_array)*self.percentage):len(sorted_array)]
-		output = []
-		for x in range(len(sorted_array)):
-			output.append(sorted_array[x][0])
-		self.output_text = ''
-		for x in output:
-			self.output_text=self.output_text + str(x)
-		#remove all spaces from string
-		self.output_text = ' '.join(self.output_text.split())
-		return self.output_text
-	def tf_idf_table(self):
-		tokenized = sent_tokenize(self.text)
-		vectorizer = TfidfVectorizer(stop_words = stopwords,encoding = self.encoding)
-		tf_idf = vectorizer.fit(tokenized)
-		tf_idf =  vectorizer.transform(tokenized)
-		self.dataframe = pd.DataFrame(tf_idf.toarray(),columns = vectorizer.get_feature_names())
-		#returning pandas dataframe
-		return self.dataframe
+    def __init__(self,text,percentage=1/4,encoding='utf-8'):
+        #initializing
+        self.text = text
+        self.percentage = percentage
+        self.encoding = encoding
+        detect_lang = detect(sent_tokenize(text)[0])
+        if detect_lang == 'en':
+            self.stopwords = stopwords.words('english')
+        elif detect_lang == 'bg' or detect_lang == 'mk':
+            self.stopwords = get_stop_words('bg')
+        else:
+            try:
+                self.stopwords = get_stop_words(detect_lang)
+            except:
+                try:
+                    self.stopwords = stopwords.words(detect_lang)
+                except:
+                    self.stopwords = stopwords.words('english')
+
+    def summarize(self):
+        #tokenizing setnences
+        documents = self.text.split('.')
+        #create tf-idf vectorizer
+        vectorizer = TfidfVectorizer(stop_words = self.stopwords,encoding = self.encoding)
+        tf_idf = vectorizer.fit(documents)
+        tf_idf =  vectorizer.transform(documents)
+        tf_idf_values = []
+        #creating dataframe with pandas
+        self.df = pd.DataFrame(tf_idf.toarray(),columns = vectorizer.get_feature_names())
+        
+        for x in range(self.df.shape[0]):
+            #appending values
+            tf_idf_values.append(sum(self.df.iloc[x,:]))
+        
+        tf_idf_mean = sum(tf_idf_values)/len(tf_idf_values)
+        tf_idf_array = []
+        for x in range(len(tf_idf_values)):
+            tf_idf_array.append([documents[x],tf_idf_values[x],x])
+        #sorting array by tf-idf
+        sorted_array = sorted(tf_idf_array, key=lambda elem: elem[1] )
+        sorted_array = sorted_array[len(sorted_array)-round(len(sorted_array)*self.percentage):len(sorted_array)]
+        sorted_array = sorted(sorted_array, key = lambda elem: elem[2])
+        output = []
+        for x in range(len(sorted_array)):
+            output.append(sorted_array[x][0])
+        output_text = ''
+        for x in output:
+            output_text=output_text + str(x)
+        #remove all spaces from string
+        output_text = ' '.join(output_text.split())
+        return output_text
+    def tf_idf_table(self):
+        tokenized = sent_tokenize(self.text)
+        vectorizer = TfidfVectorizer(stop_words = stopwords,encoding = self.encoding)
+        tf_idf = vectorizer.fit(tokenized)
+        tf_idf =  vectorizer.transform(tokenized)
+        self.dataframe = pd.DataFrame(tf_idf.toarray(),columns = vectorizer.get_feature_names())
+        #returning pandas dataframe
+        return self.dataframe
+
 
 if __name__ == "__main__": 
 	text = TextSummarization("""The COVID-19 pandemic, also known as the coronavirus pandemic,
